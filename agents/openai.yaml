@@ -1,0 +1,4 @@
+interface:
+  display_name: "Taskwarrior"
+  short_description: "Manage repo tasks with Taskwarrior"
+  default_prompt: "Use repo-local Taskwarrior by default, via `python scripts/taskw.py` in the active project environment, and keep the repo snapshot in .taskwarrior/tasks.yaml instead of TODO.md."
