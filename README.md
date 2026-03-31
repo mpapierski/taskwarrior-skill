@@ -2,6 +2,27 @@
 
 This repo is a Codex skill for managing tasks with Taskwarrior instead of maintaining a handwritten `TODO.md`.
 
+## Install
+
+This repository is itself the skill root, so install it as `taskwarrior` rather than pointing at a nested subdirectory.
+
+With the Codex skill installer:
+
+```bash
+python /Users/michal/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo mpapierski/taskwarrior-skill \
+  --path . \
+  --name taskwarrior
+```
+
+Or manually with git:
+
+```bash
+git clone https://github.com/mpapierski/taskwarrior-skill.git "${CODEX_HOME:-$HOME/.codex}/skills/taskwarrior"
+```
+
+Restart Codex after installation so the new skill is discovered.
+
 ## Repo-local task data
 
 The wrapper stores repo-local state under `.taskwarrior/`:
