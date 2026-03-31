@@ -151,6 +151,52 @@ class TaskWrapperIntegrationTest(unittest.TestCase):
         self.assertEqual(len(exported), 1)
         self.assertEqual(exported[0]["description"], "Ready task")
 
+    def test_imported_yaml_id_is_not_preserved_as_taskwarrior_local_id(self) -> None:
+        task_dir = self.repo_root / ".taskwarrior"
+        task_dir.mkdir()
+        (task_dir / "taskrc").write_text("# test\n")
+        (task_dir / "tasks.yaml").write_text(
+            yaml.safe_dump(
+                [
+                    {
+                        "id": 999,
+                        "description": "Imported high id task",
+                        "entry": "20260331T120000Z",
+                        "modified": "20260331T120000Z",
+                        "status": "pending",
+                        "uuid": "99999999-1111-2222-3333-444444444444",
+                    }
+                ],
+                sort_keys=False,
+                allow_unicode=True,
+            )
+        )
+
+        list_result = self.run_wrapper(
+            "--repo-root",
+            str(self.repo_root),
+            "--rebuild",
+            "list",
+        )
+        self.assertEqual(list_result.returncode, 0, msg=list_result.stderr)
+        self.assertIn("Imported high id task", list_result.stdout)
+        self.assertRegex(list_result.stdout, r"(?m)^ 1\s")
+        self.assertNotIn(" 999 ", list_result.stdout)
+
+        export_result = self.run_wrapper(
+            "--repo-root",
+            str(self.repo_root),
+            "export",
+        )
+        self.assertEqual(export_result.returncode, 0, msg=export_result.stderr)
+        exported = json.loads(export_result.stdout)
+        self.assertEqual(len(exported), 1)
+        self.assertEqual(exported[0]["id"], 1)
+        self.assertEqual(
+            exported[0]["uuid"],
+            "99999999-1111-2222-3333-444444444444",
+        )
+
     def test_undo_persists_across_wrapper_invocations(self) -> None:
         add_result = self.run_wrapper(
             "--repo-root",
